@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Pajak Kendaraan Bermotor - Versi Pemutihan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 1.5em;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 800px;
+            margin: auto;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5em;
+            font-size: 1.5em;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5em;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+        th, td {
+            padding: 0.8em;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #333;
+        }
+        td {
+            font-size: 0.85em;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        .input-section {
+            margin-top: 0.5em;
+            border-top: 2px dashed #ccc;
+            padding-top: 0.3em;
+        }
+        .form-group {
+            margin-bottom: 0.5em;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5em;
+            color: #555;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        input[type="date"], input[type="number"], select {
+            width: 100%;
+            padding: 0.8em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            outline: none;
+            font-family: 'Roboto', sans-serif;
+        }
+        input[type="date"]:focus, input[type="number"]:focus, select:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            background: none;
+            display: none;
+            -webkit-appearance: none;
+        }
+        input[type="date"] {
+            appearance: none;
+            -moz-appearance: none;
+        }
+        input[type="date"]::-ms-expand {
+            display: none;
+        }
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .input-wrapper .input-icon {
+            position: absolute;
+            right: 0.8em;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #007BFF;
+            pointer-events: none;
+            font-size: 1.2em;
+        }
+        .input-wrapper input[type="date"] {
+            padding-right: 3em;
+        }
+        .results {
+            margin-top: -1em;
+            margin-bottom: 0.5em;
+            padding-top: 0.5em;
+        }
+        .results h3 {
+            color: #007BFF;
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 0.2em;
+        }
+        .results p {
+            background-color: #e9f5ff;
+            padding: 0.8em;
+            border-left: 4px solid #007BFF;
+            border-radius: 4px;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 0.8em;
+        }
+        .details {
+            margin-top: 0.5em;
+            padding: 1em;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .details p {
+            font-size: 0.85em;
+            color: #666;
+            margin: 0.5em 0;
+            padding-left: 1em;
+            border-left: 2px solid #ccc;
+        }
+        .details h4 {
+            font-size: 0.95em;
+            margin-bottom: 0.5em;
+            margin-top: 0;
+        }
+        .warning-message {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 1em;
+            font-size: 0.9em;
+        }
+        /* --- MODIFIED HELP BUTTON CSS --- */
+        .help-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 123, 255, 0.6); /* Lebih transparan */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px; /* Lebih besar */
+            height: 60px; /* Lebih besar */
+            font-size: 28px; /* Ukuran ikon lebih besar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            z-index: 1000;
+        }
+        .help-button:hover {
+            background-color: rgba(0, 123, 255, 0.8); /* Agak buram saat dihover */
+            transform: scale(1.1); /* Efek zoom lebih terlihat */
+        }
+        /* --- END OF MODIFIED HELP BUTTON CSS --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            
+            background-color: #fefefe;
+            padding: 0; 
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px; 
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .info-modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 2px solid #007BFF;
+            background-color: #fefefe;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .info-modal-header h2 {
+            margin: 0;
+            color: #007BFF;
+            font-size: 1.3em;
+        }
+
+        .info-modal-close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .info-modal-close:hover {
+            color: #000;
+        }
+        .info-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .close-btn { 
+            display: none; 
+        } 
+        .modal-content h2 { 
+            border-bottom: none;
+            padding-bottom: 0;
+        } 
+        .modal-content p {
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        .form-row {
+            display: flex;
+            gap: 1em;
+            flex-wrap: wrap;
+        }
+        .form-row .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .calc-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.7em 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 1.5em;
+            width: 100%;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5em;
+        }
+        .calc-button:hover {
+            background-color: #0056b3;
+        }
+        .calc-modal {
+            display: none;
+            position: fixed;
+            z-index: 1002;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .calc-modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fefefe;
+            padding: 0;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .calc-modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 2px solid #007BFF;
+            background-color: #fefefe;
+            border-radius: 8px 8px 0 0;
+        }
+        .calc-modal-header h2 {
+            margin: 0;
+            color: #007BFF;
+            font-size: 1.3em;
+        }
+        .calc-modal-close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .calc-modal-close:hover {
+            color: #000;
+        }
+        .calc-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .calc-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1em;
+            margin-bottom: 1em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+        .calc-card-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3em;
+            font-size: 0.95em;
+            padding: 0.3em 0;
+        }
+        .calc-card-label {
+            color: #555;
+            font-weight: bold;
+        }
+        .calc-card-value {
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .calc-card-highlight {
+            background-color: #e9f5ff;
+            padding: 0.5em;
+            border-radius: 4px;
+            margin-top: 0.5em;
+        }
+        .mobile-card-view {
+            display: none;
+            margin-bottom: 1.5em;
+        }
+        .card-item {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1em;
+            margin-bottom: 1em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5em;
+            font-size: 0.9em;
+            text-align: center;
+            background-color: #f2f2f2;
+            padding: 0.5em;
+            border-radius: 4px;
+        }
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3em;
+            font-size: 0.85em;
+            padding: 0.3em 0;
+        }
+        .card-label {
+            color: #666;
+            font-weight: bold;
+        }
+        .card-value {
+            font-weight: bold;
+            color: #333;
+        }
+        .card-total {
+            background-color: #f9f9f9;
+            border: 2px solid #ddd;
+        }
+        @media (max-width: 768px) {
+            .container {
+                width: 98%;
+                padding: 1em;
+            }
+            h2 {
+                font-size: 1.3em;
+                margin-bottom: 1em;
+            }
+            .calc-button {
+                padding: 0.6em 0.8em;
+                font-size: 0.85em;
+            }
+            th, td {
+                padding: 0.6em 0.4em;
+                font-size: 0.8em;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .form-row .form-group {
+                min-width: 100%;
+            }
+            input[type="date"], input[type="number"], select {
+                padding: 0.7em;
+                font-size: 0.95em;
+            }
+            .results h3 {
+                font-size: 1em;
+            }
+            .results p {
+                font-size: 0.9em;
+                padding: 0.6em;
+            }
+            .details h4 {
+                font-size: 0.9em;
+            }
+            .details p {
+                font-size: 0.8em;
+            }
+            /* --- MODIFIED HELP BUTTON MEDIA QUERY --- */
+            .help-button {
+                width: 55px;
+                height: 55px;
+                font-size: 24px;
+                bottom: 15px;
+                right: 15px;
+            }
+            /* --- END OF MODIFIED HELP BUTTON MEDIA QUERY --- */
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+                padding: 15px;
+            }
+            .modal-content h2 {
+                font-size: 1.2em;
+            }
+            .modal-content p {
+                font-size: 0.85em;
+            }
+            .calc-modal-content {
+                width: 95%;
+            }
+            .calc-modal-header {
+                padding: 15px;
+            }
+            .calc-modal-body {
+                padding: 15px;
+            }
+        }
+        @media (max-width: 600px) {
+            .table-container {
+                display: none;
+            }
+            .mobile-card-view {
+                display: block;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                border-radius: 0;
+                padding: 0.8em;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+            th, td {
+                padding: 0.5em 0.3em;
+                font-size: 0.75em;
+            }
+            input[type="date"], input[type="number"], select {
+                padding: 0.6em;
+                font-size: 0.9em;
+            }
+            .results p {
+                font-size: 0.85em;
+            }
+            .details h4 {
+                font-size: 0.85em;
+            }
+            .details p {
+                font-size: 0.75em;
+            }
+            /* --- MODIFIED HELP BUTTON MEDIA QUERY --- */
+            .help-button {
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+            }
+            /* --- END OF MODIFIED HELP BUTTON MEDIA QUERY --- */
+            .card-title {
+                font-size: 0.85em;
+            }
+            .card-row {
+                font-size: 0.8em;
+            }
+            .calc-modal-header {
+                padding: 12px;
+            }
+            .calc-modal-header h2 {
+                font-size: 1.1em;
+            }
+            .calc-modal-body {
+                padding: 12px;
+            }
+            .calc-card-row {
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cek Pajak Kendaraan Bermotor</h2>
+    
+    <button class="calc-button" id="showCalcBtn">
+        <i class="fas fa-calculator"></i> Lihat Detail Perhitungan
+    </button>
+
+    <div class="table-container">
+        <table id="rekapTable">
+            <thead>
+                <tr>
+                    <th>Keterangan</th>
+                    <th>Pokok PKB</th>
+                    <th>Sanksi Opsen PKB</th>
+                    <th>SWDKLLJ</th>
+                    <th>Sanksi SWDKLLJ</th>
+                    <th>Jumlah</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Jumlah</td>
+                    <td id="pkbPokok">0</td>
+                    <td id="pkbSanksi">0</td>
+                    <td id="swdklljPokok">0</td>
+                    <td id="swdklljSanksi">0</td>
+                    <td id="totalJumlah">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="mobile-card-view">
+        <div class="card-item">
+            <div class="card-title">Rekapitulasi Pajak Kendaraan</div>
+            <div class="card-row">
+                <span class="card-label">Pokok PKB:</span>
+                <span class="card-value" id="pkbPokokMobile">0</span>
+            </div>
+            <div class="card-row">
+                <span class="card-label">Sanksi Opsen PKB:</span>
+                <span class="card-value" id="pkbSanksiMobile">0</span>
+            </div>
+            <div class="card-row">
+                <span class="card-label">SWDKLLJ:</span>
+                <span class="card-value" id="swdklljPokokMobile">0</span>
+            </div>
+            <div class="card-row">
+                <span class="card-label">Sanksi SWDKLLJ:</span>
+                <span class="card-value" id="swdklljSanksiMobile">0</span>
+            </div>
+            <div class="card-row card-total">
+                <span class="card-label">Jumlah:</span>
+                <span class="card-value" id="totalJumlahMobile">0</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="input-section">
+        <h3>Input Data Perhitungan</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="startDate">Berlaku Sampai</label>
+                <div class="input-wrapper">
+                    <input type="date" id="startDate"> 
+                    <i class="fas fa-calendar-alt input-icon"></i>
+                </div>
+                <p style="color: red; margin-top:2px; font-size: 0.8em;">* Denda opsen PKB maksimal 5 tahun dari hari ini</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="nominal">Nominal PKB</label>
+                <input type="number" id="nominal" value="" placeholder="misalnya: 256000"> 
+                <p style="color: red; margin-top:2px; font-size: 0.8em;">* Gunakan nominal pokok PKB setahun</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="vehicleType">Jenis Kendaraan</label>
+                <select id="vehicleType">
+                    <option value="roda2">Roda 2</option>
+                    <option value="roda4">Roda 4</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button class="help-button" id="openModalBtn">
+    <i class="fas fa-question-circle"></i> 
+</button>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <div class="info-modal-header">
+            <h2>Info Penting Pemutihan 📢</h2>
+            <span class="info-modal-close" id="closeModalBtn">&times;</span>
+        </div>
+        
+        <div class="info-modal-body">
+            <p>
+               <strong>Catatan:<br></strong>
+               SWDKLLJ Roda 4: Rp 143.000/Tahun.<br>
+               SWDKLLJ Roda 2: Rp 35.000/Tahun.<br>
+               Sanksi SWDKLLJ Roda 4: Rp 35.000/3 Bulan.<br>
+               Sanksi SWDKLLJ Roda 2: Rp 8.000/3 Bulan.<br>
+            </p>
+            <p><strong>Perhitungan Denda Opsen PKB:</strong> Dalam rangka pemutihan, denda opsen PKB dihapuskan (dihitung sebagai Rp 0).</p>
+            <p><strong>Perhitungan Pokok PKB:</strong> Total pokok PKB yang harus dibayarkan maksimal 6 tahun. Perhitungan ini juga memperhitungkan batas pembayaran 90 hari sebelum jatuh tempo.</p>
+            <p><strong>Perhitungan Sanksi SWDKLLJ:</strong> Sanksi hanya dihitung untuk 1 tahun berjalan. Keterlambatan dihitung per 3 bulan.</p>
+            <p style="font-size: 0.8em; color: gray;">* Perhitungan ini hanyalah perkiraan dan mungkin berbeda dengan ketetapan resmi dari samsat. Selalu konfirmasi ke Samsat terdekat. By : Samker</p>
+        </div>
+    </div>
+</div>
+
+<div id="calcModal" class="calc-modal">
+    <div class="calc-modal-content">
+        <div class="calc-modal-header">
+            <h2>Detail Perhitungan Pajak</h2>
+            <span class="calc-modal-close" id="closeCalcModalBtn">&times;</span>
+        </div>
+        <div class="calc-modal-body">
+            <div class="calc-card">
+                <div class="calc-card-row">
+                    <span class="calc-card-label">Jumlah Pokok PKB:</span>
+                    <span class="calc-card-value">Rp <span id="annualNominalResult">0</span></span>
+                </div>
+                <div class="calc-card-row">
+                    <span class="calc-card-label">Denda Opsen PKB:</span>
+                    <span class="calc-card-value" style="color: green; font-weight: bold;">Rp <span id="nominalResult">0 (Pemutihan)</span></span>
+                </div>
+            </div>
+
+            <div class="results">
+            <div class="details" style="display: none;"> <h4>Selisih Masa Berlaku: <span id="totalMonthsResult">0</span> Bulan</h4>
+                <div id="calculationDetails"></div>
+            </div>
+
+                <p class="warning-message" id="annualWarningMessage" style="display:none;"></p>
+                <div class="details">
+                    <h4>Jumlah Keterlambatan: <span id="totalYearsResult">0</span> Tahun</h4>
+                    <div id="annualCalculationDetails"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const startDateInput = document.getElementById('startDate');
+    const nominalInput = document.getElementById('nominal');
+    const vehicleTypeSelect = document.getElementById('vehicleType');
+    const totalMonthsResult = document.getElementById('totalMonthsResult');
+    const nominalResult = document.getElementById('nominalResult');
+    const calculationDetails = document.getElementById('calculationDetails');
+
+    const totalYearsResult = document.getElementById('totalYearsResult');
+    const annualNominalResult = document.getElementById('annualNominalResult');
+    const annualCalculationDetails = document.getElementById('annualCalculationDetails');
+    const annualWarningMessage = document.getElementById('annualWarningMessage');
+
+    // Table elements
+    const pkbPokok = document.getElementById('pkbPokok');
+    const pkbSanksi = document.getElementById('pkbSanksi');
+    const swdklljPokok = document.getElementById('swdklljPokok');
+    const swdklljSanksi = document.getElementById('swdklljSanksi');
+    const totalJumlah = document.getElementById('totalJumlah');
+    
+    // Mobile card elements
+    const pkbPokokMobile = document.getElementById('pkbPokokMobile');
+    const pkbSanksiMobile = document.getElementById('pkbSanksiMobile');
+    const swdklljPokokMobile = document.getElementById('swdklljPokokMobile');
+    const swdklljSanksiMobile = document.getElementById('swdklljSanksiMobile');
+    const totalJumlahMobile = document.getElementById('totalJumlahMobile');
+
+    // Set today's date as default
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    // **MODIFIKASI INI MENGISI INPUT TANGGAL SECARA DEFAULT**
+    startDateInput.value = formattedDate; 
+    
+    function formatNumber(num) {
+        return num.toLocaleString('id-ID');
+    }
+
+    function updateTable() {
+        const nominal = parseFloat(nominalInput.value) || 0;
+        const totalYears = parseInt(totalYearsResult.textContent) || 0;
+        const vehicleType = vehicleTypeSelect.value;
+        
+        // --- PEMUTIHAN MODIFICATION ---
+        // Sanksi Opsen PKB is set to 0
+        const dendaOpsen = 0; 
+        const dendaOpsenFormatted = formatNumber(dendaOpsen);
+        
+        // Calculate PKB Pokok
+        const pkbTotal = nominal * totalYears;
+        const pkbTotalFormatted = formatNumber(pkbTotal);
+        
+        // Update table
+        pkbPokok.textContent = pkbTotalFormatted;
+        pkbSanksi.textContent = dendaOpsenFormatted;
+        
+        // Update mobile cards
+        pkbPokokMobile.textContent = pkbTotalFormatted;
+        pkbSanksiMobile.textContent = dendaOpsenFormatted;
+        
+        // Calculate SWDKLLJ values
+        let swdklljAnnual = vehicleType === 'roda4' ? 143000 : 35000;
+        let swdklljFinePerQuarter = vehicleType === 'roda4' ? 35000 : 8000;
+        
+        const swdklljTotal = swdklljAnnual * totalYears;
+        
+        // --- MODIFIED SANKSI SWDKLLJ LOGIC: Use Days for Penalty Months (Rounded Up) ---
+        // Sanksi dihitung hanya untuk 1 tahun berjalan.
+        const startDateStr = startDateInput.value;
+        if (!startDateStr) {
+            swdklljPokok.textContent = formatNumber(0);
+            swdklljSanksi.textContent = formatNumber(0);
+            swdklljPokokMobile.textContent = formatNumber(0);
+            swdklljSanksiMobile.textContent = formatNumber(0);
+            totalJumlah.textContent = formatNumber(pkbTotal);
+            totalJumlahMobile.textContent = formatNumber(pkbTotal);
+            return;
+        }
+
+        const startDate = new Date(startDateStr);
+        startDate.setHours(0, 0, 0, 0);
+
+        let swdklljFine = 0;
+
+        // Define today inside the function to ensure it's always current
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const oneDay = 24 * 60 * 60 * 1000;
+        const daysPerMonthForPenalty = 30; // Standard approximation for penalty calculation
+
+        if (today.getTime() > startDate.getTime()) {
+            const timeDiff = today.getTime() - startDate.getTime();
+            const totalDaysLate = Math.floor(timeDiff / oneDay);
+            
+            // Calculate total months for penalty (Math.ceil ensures 1 day late = 1 month penalty)
+            let totalPenaltyMonths = Math.ceil(totalDaysLate / daysPerMonthForPenalty);
+            
+            // Limit penalty months to the running year's part (modulo 12)
+            let monthsInRunningYear = totalPenaltyMonths % 12;
+
+            // Handle the case where the delay is exactly N years (e.g., 12 months, 24 months).
+            if (totalDaysLate > 0 && monthsInRunningYear === 0) {
+                 monthsInRunningYear = 12;
+            } 
+            
+            // Calculate fine based on 3-month periods
+            if (monthsInRunningYear > 0) {
+                const quarterPeriods = Math.ceil(monthsInRunningYear / 3);
+                swdklljFine = quarterPeriods * swdklljFinePerQuarter;
+            }
+        }
+        // --- END OF MODIFIED LOGIC ---
+        
+        const swdklljTotalFormatted = formatNumber(swdklljTotal);
+        const swdklljFineFormatted = formatNumber(swdklljFine);
+        
+        // Update table
+        swdklljPokok.textContent = swdklljTotalFormatted;
+        swdklljSanksi.textContent = swdklljFineFormatted;
+        
+        // Update mobile cards
+        swdklljPokokMobile.textContent = swdklljTotalFormatted;
+        swdklljSanksiMobile.textContent = swdklljFineFormatted;
+        
+        // Calculate total
+        const totalJumlahValue = pkbTotal + dendaOpsen + swdklljTotal + swdklljFine;
+        const totalJumlahFormatted = formatNumber(totalJumlahValue);
+        
+        // Update table
+        totalJumlah.textContent = totalJumlahFormatted;
+        
+        // Update mobile cards
+        totalJumlahMobile.textContent = totalJumlahFormatted;
+    }
+
+    function performCalculation() {
+        const startDateStr = startDateInput.value;
+        const nominal = parseFloat(nominalInput.value) || 0;
+
+        const resetOutput = () => {
+            totalMonthsResult.textContent = '0';
+            nominalResult.innerHTML = '0 (Pemutihan)'; // Update to show pemutihan status
+            calculationDetails.innerHTML = '';
+            totalYearsResult.textContent = '0';
+            annualNominalResult.textContent = '0';
+            annualCalculationDetails.innerHTML = '';
+            annualWarningMessage.style.display = 'none';
+        };
+
+        if (!startDateStr || nominal === 0) {
+            // JANGAN MERESET JIKA HANYA NOMINAL YANG KOSONG DAN TANGGAL SUDAH DISET.
+            if (!startDateStr) {
+                 resetOutput();
+                 updateTable();
+                 return;
+            }
+        }
+
+        const startDate = new Date(startDateStr);
+        startDate.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // --- Denda Opsen PKB is always 0 for Pemutihan ---
+        nominalResult.innerHTML = '0 (Pemutihan)';
+        calculationDetails.innerHTML = '<p>Sesuai program pemutihan, denda PKB dihapuskan.</p>';
+        totalMonthsResult.textContent = '0';
+        
+
+        // --- Logika Perhitungan Tahunan (Pokok PKB) ---
+        const oneDay = 24 * 60 * 60 * 1000;
+        const ninetyDays = 90 * oneDay;
+        const timeDiff = today.getTime() - startDate.getTime();
+
+        if (timeDiff < -ninetyDays) {
+            resetOutput();
+            updateTable();
+            return;
+        }
+
+        annualWarningMessage.style.display = 'none';
+
+        let totalYears = 0;
+
+        if (today.getTime() >= startDate.getTime()) {
+            // Case 1: Jatuh tempo sudah terlewati (termasuk hari ini)
+            const currentYear = today.getFullYear();
+            const startYear = startDate.getFullYear();
+            
+            // Hitung jumlah tahun keterlambatan
+            totalYears = currentYear - startYear + 1;
+            
+            // Cek apakah pembayaran tahun berikutnya sudah terhitung karena sudah dalam rentang 90 hari
+            const nextYearJT = new Date(startYear + totalYears, startDate.getMonth(), startDate.getDate());
+            nextYearJT.setHours(0, 0, 0, 0);
+
+            const nextYearDiff = nextYearJT.getTime() - today.getTime();
+
+            // Jika JT tahun berikutnya sudah lewat HARI INI atau dalam 90 hari ke depan
+            if (nextYearDiff <= ninetyDays) {
+                totalYears += 1;
+            }
+
+
+        } else { 
+            // Case 2: Jatuh tempo di masa depan (maks 90 hari)
+            if (timeDiff >= -ninetyDays) {
+                // Dalam rentang 90 hari sebelum jatuh tempo
+                totalYears = 1; // Bayar untuk tahun JT
+            }
+        }
+        
+        // Pembatasan maksimal 6 tahun
+        const maxYears = 6;
+        let finalTotalYears = totalYears;
+        
+        if (finalTotalYears > maxYears) {
+            finalTotalYears = maxYears;
+        }
+
+        // **START PERBAIKAN LOGIKA PENENTUAN TAHUN AWAL PKB**
+        
+        const startYear = startDate.getFullYear();
+        
+        // 1. Tentukan tahun terakhir yang terhitung (tahun jatuh tempo terbaru)
+        let lastYearToCount;
+
+        if (today.getTime() < startDate.getTime() && timeDiff >= -ninetyDays) {
+            // Kasus 90 hari di muka: tahun yang dibayar adalah tahun JT (e.g., JT 2026)
+            lastYearToCount = startDate.getFullYear();
+        } else {
+            // Kasus keterlambatan: ambil tahun JT terakhir yang termasuk dalam perhitungan 
+            // totalYears yang sudah dihitung sebelumnya.
+            lastYearToCount = startYear + totalYears - 1;
+        }
+        
+        // 2. Terapkan logika 6 tahun mundur dari tahun terakhir yang terhitung
+        let startDisplayYear;
+        
+        if (totalYears > maxYears) {
+             // Jika keterlambatan > 6 tahun, kita hitung 6 tahun mundur dari lastYearToCount
+             // Contoh: lastYearToCount=2026. startDisplayYear = 2026 - 6 + 1 = 2021.
+             startDisplayYear = lastYearToCount - maxYears + 1;
+        } else {
+             // Jika keterlambatan <= 6 tahun, mulai dari tahun jatuh tempo awal
+             startDisplayYear = startYear;
+             
+             // Pastikan finalTotalYears tidak melebihi jumlah tahun yang ada (misal: JT 2023, Today 2025 = 3 tahun)
+             if(today.getTime() >= startDate.getTime()){
+                // Jika sudah terlambat, total tahun adalah dari startYear sampai tahun terakhir (termasuk 90 hari)
+                finalTotalYears = lastYearToCount - startDisplayYear + 1;
+             } else {
+                // Kasus 90 hari di muka
+                finalTotalYears = 1;
+             }
+        }
+        
+        // **END PERBAIKAN LOGIKA**
+
+        const annualCalculation = nominal * finalTotalYears;
+
+        totalYearsResult.textContent = finalTotalYears; // Gunakan finalTotalYears yang sudah dibatasi
+        annualNominalResult.textContent = formatNumber(annualCalculation);
+
+        if (finalTotalYears > 0) {
+            let detailsAnnualHtml = '';
+            // Tampilan PKB Tahun ke-X
+            for (let i = 0; i < finalTotalYears; i++) {
+                let yearToDisplay = startDisplayYear + i;
+                detailsAnnualHtml += `<p>PKB Tahun ke-${i + 1}: PKB Tahun ${yearToDisplay}</p>`;
+            }
+            annualCalculationDetails.innerHTML = detailsAnnualHtml;
+        } else {
+             annualCalculationDetails.innerHTML = '';
+        }
+        
+        // Update table with new values
+        updateTable();
+    }
+
+    // Event listeners for inputs
+    startDateInput.addEventListener('change', performCalculation);
+    nominalInput.addEventListener('input', performCalculation);
+    vehicleTypeSelect.addEventListener('change', performCalculation);
+    
+    // Initial calculation (Dilakukan setelah startDateInput.value diisi)
+    performCalculation();
+
+    // --- Logika Pop-up (Modal) Bantuan ---
+    const modal = document.getElementById("myModal");
+    const btn = document.getElementById("openModalBtn");
+    const span = document.getElementById("closeModalBtn");
+    
+    btn.onclick = function(e) {
+      e.preventDefault();
+      modal.style.display = "block";
+    }
+
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+    
+    // --- Logika Pop-up (Modal) Perhitungan ---\
+    const calcModal = document.getElementById("calcModal");
+    const calcBtn = document.getElementById("showCalcBtn");
+    const calcCloseBtn = document.getElementById("closeCalcModalBtn");
+    
+    calcBtn.onclick = function(e) {
+      e.preventDefault();
+      performCalculation(); // Recalculate before showing
+      calcModal.style.display = "block";
+    }
+
+    calcCloseBtn.onclick = function() {
+      calcModal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == calcModal) {
+        calcModal.style.display = "none";
+      }
+    }
+});
+</script>
+</body>
+</html>

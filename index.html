@@ -612,7 +612,7 @@
         </div>
     </div>
     
-    <div id="copyAlert">Nominal berhasil disalin!</div>
+    <div id="copyAlert" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background-color: #333; color: white; padding: 10px 20px; border-radius: 5px; z-index: 2001; display: none; font-size: 0.9em;">Nominal berhasil disalin!</div>
 
 </div>
 
@@ -1164,6 +1164,9 @@ document.addEventListener('DOMContentLoaded', () => {
             formatCurrencyInput(this); // Format with thousand separators
             calculatePkbSteps();       // Re-calculate
         });
+        
+        // Initial formatting of existing value if any
+        formatCurrencyInput(dpPkbInput); 
     }
 
     if(persentasePkbSelect) persentasePkbSelect.addEventListener('change', calculatePkbSteps);

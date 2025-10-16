@@ -7,11 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        /* [1] KOREKSI: Tambahkan definisi variabel tinggi viewport */
+        /* ==================================== */
+        /* KOREKSI KRUSIAL: SETUP TINGGI LAYAR UNTUK MOBILE CHROME */
+        /* ==================================== */
         :root {
-          --vh: 1vh; /* Default ke 1vh */
+          --vh: 1vh; 
         }
-
+        
+        /* 1. KOREKSI: Set height 100% pada html & body, hapus overflow default */
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Mencegah scroll pada body utama */
+        }
+        
         /* ==================================== */
         /* BASE & FRAME STYLES */
         /* ==================================== */
@@ -21,7 +29,7 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
+            /* 2. KOREKSI: Hapus min-height: 100vh dari body agar tidak konflik */
             margin: 0;
             padding: 0;
             font-size: 14px; 
@@ -32,19 +40,21 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 800px;
-            /* [2] KOREKSI KRUSIAL: Ganti height: 100vh dengan perhitungan variabel */
+            /* 3. KOREKSI: Hanya andalkan perhitungan variabel dari JS */
             height: calc(var(--vh, 1vh) * 100); 
-            min-height: 100vh; /* Tetap pertahankan min-height sebagai fallback */
+            /* min-height: 100vh; Dihapus karena konflik */
             display: flex;
             flex-direction: column;
             position: relative;
+            /* Pastikan frame-nya scrollable, bukan body */
+            overflow: hidden;
         }
 
         .content-area {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 60px;
+            padding-bottom: 60px; /* Jarak untuk tab bar */
         }
         
         .container {
@@ -56,7 +66,6 @@
         }
         h2 { 
             font-size: 1.5em; margin-top: 0.5em; margin-bottom: 1 em; 
-           /* border-bottom: 2px solid #007BFF; padding-bottom: 5px; */
             color: #007BFF;
             font-weight: 700;
         }
@@ -668,15 +677,16 @@
 
 <script>
 // ===================================
-// [3] KOREKSI KRUSIAL: SCRIPT PERHITUNGAN TINGGI VIEWPORT UNTUK MENGATASI CHROME MOBILE BUG
+// SCRIPT KRUSIAL: MENGATASI CHROME MOBILE 100VH BUG
 // ===================================
 function setDocHeight() {
-  // Mengambil tinggi jendela saat ini, dibagi 100 untuk mendapatkan nilai 1% dari viewport height.
-  // Ini akan menjadi nilai akurat untuk --vh.
-  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  // Hitung tinggi yang akurat untuk 1% dari viewport
+  const vh = window.innerHeight * 0.01;
+  // Set variabel CSS --vh
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 
-// Jalankan saat load dan setiap kali ukuran jendela berubah (termasuk saat address bar mobile menghilang)
+// Jalankan saat load dan setiap kali ukuran jendela berubah (misalnya, saat address bar menyusut)
 window.addEventListener('resize', setDocHeight);
 window.addEventListener('orientationchange', setDocHeight);
 setDocHeight(); 

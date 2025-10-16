@@ -8,16 +8,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         /* ==================================== */
-        /* KOREKSI KRUSIAL: SETUP TINGGI LAYAR UNTUK MOBILE CHROME */
+        /* KOREKSI KRUSIAL: SETUP TINGGI LAYAR UNTUK MOBILE CHROME (FIXING 100VH BUG) */
         /* ==================================== */
         :root {
-          --vh: 1vh; 
+          --vh: 1vh; /* Default fallback */
         }
         
         /* 1. KOREKSI: Set height 100% pada html & body, hapus overflow default */
         html, body {
             height: 100%;
-            overflow: hidden; /* Mencegah scroll pada body utama */
+            overflow: hidden; /* Mencegah scroll pada body utama yang menyebabkan 'panjang ke samping' */
+            margin: 0;
+            padding: 0;
         }
         
         /* ==================================== */
@@ -29,9 +31,7 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            /* 2. KOREKSI: Hapus min-height: 100vh dari body agar tidak konflik */
-            margin: 0;
-            padding: 0;
+            /* KOREKSI: Hapus min-height: 100vh dari body agar tidak konflik */
             font-size: 14px; 
         }
         
@@ -40,19 +40,18 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 800px;
-            /* 3. KOREKSI: Hanya andalkan perhitungan variabel dari JS */
+            /* KOREKSI KRUSIAL: Hanya andalkan perhitungan variabel dari JS */
             height: calc(var(--vh, 1vh) * 100); 
-            /* min-height: 100vh; Dihapus karena konflik */
             display: flex;
             flex-direction: column;
             position: relative;
-            /* Pastikan frame-nya scrollable, bukan body */
-            overflow: hidden;
+            /* Pastikan frame-nya yang overflow/scrollable */
+            overflow: hidden; 
         }
 
         .content-area {
             flex: 1;
-            overflow-y: auto;
+            overflow-y: auto; /* Memungkinkan konten di dalamnya di-scroll */
             -webkit-overflow-scrolling: touch;
             padding-bottom: 60px; /* Jarak untuk tab bar */
         }
@@ -61,6 +60,7 @@
             background-color: #fff;
             padding: 1em; 
             width: 100%;
+            max-width: 100%; /* Memastikan tidak over-lebar */
             box-sizing: border-box;
             margin: auto;
         }
@@ -157,13 +157,16 @@
             display: flex; align-items: center; justify-content: center; gap: 0.5em;
         }
         
-        /* REKAPITULASI TABLE (Tampilan Desktop) */
+        /* REKAPITULASI TABLE (Tampilan Desktop & Responsif) */
         #cekPajakPage .table-container { 
-            overflow-x: auto; margin-bottom: 1.5em; 
+            overflow-x: auto; /* KRUSIAL: Memungkinkan scroll horizontal pada tabel di desktop kecil/tablet */
+            margin-bottom: 1.5em; 
             border: 1px solid #ddd; border-radius: 8px; 
         } 
         #cekPajakPage #rekapTable { 
-            width: 100%; border-collapse: collapse; font-size: 0.9em; min-width: 750px; 
+            width: 100%; 
+            border-collapse: collapse; font-size: 0.9em; 
+            min-width: 750px; /* KRUSIAL: Memastikan tabel tidak terlalu sempit, sehingga bisa di-scroll */
         } 
         #cekPajakPage #rekapTable th, #cekPajakPage #rekapTable td { 
             border: 1px solid #eee; padding: 6px 8px; text-align: right; 
@@ -692,51 +695,50 @@ window.addEventListener('orientationchange', setDocHeight);
 setDocHeight(); 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    // ===================================
-    // HELPER FUNCTION: ROUND UP TO NEAREST 500
-    // ===================================
-    function roundUpToNearest500(num) {
-        if (num <= 0) return 0;
-        // Math.ceil(num / 500) * 500 will round the number up to the nearest multiple of 500.
-        return Math.ceil(num / 500) * 500;
-    }
+// ===================================
+// HELPER FUNCTION: ROUND UP TO NEAREST 500
+// ===================================
+function roundUpToNearest500(num) {
+    if (num <= 0) return 0;
+    // Math.ceil(num / 500) * 500 will round the number up to the nearest multiple of 500.
+    return Math.ceil(num / 500) * 500;
+}
 
-    // ===================================
-    // GLOBAL COPY FUNCTION (for Tab 2)
-    // ===================================
-    function copyResult(elementId) {
-        const inputElement = document.getElementById(elementId);
-        
-        // Remove formatting before copying
-        const nominalText = inputElement.value.replace('Rp ', '').replace(/\./g, '');
-
-        const tempInput = document.createElement('input');
-        tempInput.value = nominalText;
-        document.body.appendChild(tempInput);
-        
-        tempInput.select();
-        tempInput.setSelectionRange(0, 99999);
-
-        try {
-            document.execCommand('copy');
-            
-            const alertBox = document.getElementById('copyAlert');
-            alertBox.style.display = 'block';
-            setTimeout(() => {
-                alertBox.style.display = 'none';
-            }, 1500);
-
-        } catch (err) {
-            console.error('Gagal menyalin teks: ', err);
-            alert('Gagal menyalin. Silakan salin manual: ' + nominalText);
-        }
-        
-        document.body.removeChild(tempInput);
-    }
-
-
+// ===================================
+// GLOBAL COPY FUNCTION (for Tab 2)
+// ===================================
+function copyResult(elementId) {
+    const inputElement = document.getElementById(elementId);
     
+    // Remove formatting before copying
+    const nominalText = inputElement.value.replace('Rp ', '').replace(/\./g, '');
+
+    const tempInput = document.createElement('input');
+    tempInput.value = nominalText;
+    document.body.appendChild(tempInput);
+    
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999);
+
+    try {
+        document.execCommand('copy');
+        
+        const alertBox = document.getElementById('copyAlert');
+        alertBox.style.display = 'block';
+        setTimeout(() => {
+            alertBox.style.display = 'none';
+        }, 1500);
+
+    } catch (err) {
+        console.error('Gagal menyalin teks: ', err);
+        alert('Gagal menyalin. Silakan salin manual: ' + nominalText);
+    }
+    
+    document.body.removeChild(tempInput);
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
     // ===================================
     // HELPER FUNCTIONS
     // ===================================
